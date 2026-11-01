@@ -29,13 +29,13 @@
 ### Example with WhatIf
 
 ```powershell
-.\massrename.ps1 -WhatIf
+.\massrename.ps1 -whatIf
 ```
 
 ### Example with DirName prefix
 
 ```powershell
-.\massrename.ps1 -UseDirName
+.\massrename.ps1 -usedirname
 ```
 
 ### Example with FileType override

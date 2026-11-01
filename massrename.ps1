@@ -1,7 +1,7 @@
 # PS Script to rename all files in a directory based on regex pattern assigned in $rxpattern and a new prefix
 param(
-    [switch]$WhatIf,
-    [switch]$UseDirName,
+    [switch]$whatIf,
+    [switch]$useDirName,
     [string]$FileType = $CONFIG_OBJECT.CBZ_FILE_EXT
 )
 $CONFIG_FILE="C:\Users\jimmy\Documents\mlibrary\ps-scripts\custom_ps_scripts\config.json"
@@ -18,12 +18,12 @@ $successCount = 0
 $failedCount = 0
 $failedFiles = @()
 
-$rxpattern = "Ch. " #^(\d{0,3}\s)|\s\(\D*\-\D*\)|\s\(\d*\sof\s\d*\)|\s\(of\s\d*\)" #"\s\(\D*\s?\)|\(\w*\)\s" #"\s\(\D*\s?\)|\s?\(.*\)\s?" #"\s\(\D*\s?\)|\(\w*\)\s"
+$rxpattern = "Chapter " #^(\d{0,3}\s)|\s\(\D*\-\D*\)|\s\(\d*\sof\s\d*\)|\s\(of\s\d*\)" #"\s\(\D*\s?\)|\(\w*\)\s" #"\s\(\D*\s?\)|\s?\(.*\)\s?" #"\s\(\D*\s?\)|\(\w*\)\s"
 # $manhwaPattern = "\s-\s(SE\s\d{1,3}\s\-)?[a-zA-z'\s\.,\-\d!]+"  # removes the chapter name and SE numbers
 # $rxLeadZPattern = "\.|c[h.0-9]{1,4} ch"
 $dirName = Split-Path -Path $SourceDirectory -Leaf # sometimes name is repeated, manually apply
 # Use directory name as prefix if -UseDirName switch is supplied, otherwise default to "Chapter "
-if ($UseDirName) {
+if ($useDirName) {
     $newPrefix = "$dirName - Chapter "
 } else {
     $newPrefix = "Chapter "
@@ -59,7 +59,7 @@ $items  |
       ## Disabled to prevent losing file path when when proccessing files only
       $newName = "$cleanName" #$fileType 
       Write-Host "The item is a directory. $($_.Name) >>>> newname: $newName" -ForegroundColor Green
-      if (-not $WhatIf) {
+      if (-not $whatIf) {
           try {
               Rename-Item -LiteralPath $_.FullName -NewName $newName -ErrorAction Stop
               $successCount++
@@ -77,7 +77,7 @@ $items  |
       Write-Host "fileExtension: $fileExtension" -ForegroundColor Cyan
       $newName = "$cleanName$fileExtension" #$fileType
       Write-Host "The item is a file. $($_.Name)  >>>> newname: $newName" -ForegroundColor Yellow
-      if (-not $WhatIf) {
+      if (-not $whatIf) {
           try {
               Rename-Item -LiteralPath $_.FullName -NewName $newName -ErrorAction Stop
               $successCount++
