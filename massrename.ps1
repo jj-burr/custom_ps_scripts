@@ -31,11 +31,13 @@ if ($cleanChapter) {
 
 # Get list of Chapter ### files
 $items=Get-ChildItem -LiteralPath $SourceDirectory -Recurse -File "*" # Swap File to Directory here
-# Parse comma‑separated file extensions from config
-$allowedExtensions = $filetype -split ',\s*'
-# Use the first extension as the default rename extension
-$filetype = $allowedExtensions[0]
-# Total files (all files, extension check happens inside the loop)
+# Allowed file extensions from config (comma‑separated)
+$allowedfiletypes = $CONFIG_OBJECT.FILE_EXT -split ',\s*'
+# Keep only files whose extension is in the allowed list (.cbz, .rar)
+$items = $items | Where-Object { $allowedfiletypes -contains $_.Extension }
+# Use .cbz as the rename extension (default)
+$filetype = '.cbz'
+# Total files that match the allowed extensions
 $totalFiles = $items.Count
 Write-Host "Total $filetype files found: $totalFiles" -ForegroundColor Cyan
 
@@ -49,11 +51,6 @@ $items  |
      
 $matchvalue = $Matches[0]
      write-host "matchvalue:::: $matchvalue" -ForegroundColor green
-
-     # Check if file extension is in the allowed list from config
-     if (!($_.Extension -in $allowedExtensions)) {
-         Write-Host "Note: $($_.Name) extension '$($_.Extension)' not in allowed list $filetype" -ForegroundColor Yellow
-     }
 
      $cleanName = $_.BaseName -replace $rxpattern,  $newprefix #"$newPrefix$matchvalue" #$newPrefix #
     write-host "cleanName:::: $cleanName$filetype" -ForegroundColor green
