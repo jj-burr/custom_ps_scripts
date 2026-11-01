@@ -26,15 +26,31 @@
 .\massrename.ps1
 ```
 
+### Example with WhatIf
+
+```powershell
+.\massrename.ps1 -WhatIf
+```
+
+### Example with DirName prefix
+
+```powershell
+.\massrename.ps1 -UseDirName
+```
+
 ### Config Updates Required
 
 The script expects a `config.json` file at the same location with the following keys:
 
 - `SRC_DIRECTORY` – source directory containing the files to rename
 - `CBZ_FILE_EXT` – file extension to apply (e.g., `.cbz`)
-- `NEW_PREFIX` – prefix to use for renamed files (e.g., `Chapter `)
 
-Update `config.json` with the appropriate paths and prefix before running.
+The `NEW_PREFIX` key has been removed. The new prefix is determined by the `-UseDirName` switch:
+
+- **Default** (`-UseDirName` not used): prefix is `"Chapter "` (e.g., `Chapter 001.cbz`).
+- **Use directory name** (`-UseDirName`): prefix is the source directory name (e.g., `On the Way to Meet Mom Chapter 001.cbz`).
+
+Update `config.json` with the appropriate `SRC_DIRECTORY` and `CBZ_FILE_EXT` values before running.
 
 ---
 
