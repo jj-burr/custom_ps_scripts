@@ -1,6 +1,6 @@
 # PS Script to rename all files in a directory based on regex pattern assigned in $rxpattern and a new prefix
 param(
-    [switch]$whatIf,
+    [switch]$whatif,
     [switch]$useDirName,
     [string]$FileType = $CONFIG_OBJECT.CBZ_FILE_EXT
 )
@@ -59,7 +59,7 @@ $items  |
       ## Disabled to prevent losing file path when when proccessing files only
       $newName = "$cleanName" #$fileType 
       Write-Host "The item is a directory. $($_.Name) >>>> newname: $newName" -ForegroundColor Green
-      if (-not $whatIf) {
+      if (-not $whatif) {
           try {
               Rename-Item -LiteralPath $_.FullName -NewName $newName -ErrorAction Stop
               $successCount++
@@ -77,7 +77,7 @@ $items  |
       Write-Host "fileExtension: $fileExtension" -ForegroundColor Cyan
       $newName = "$cleanName$fileExtension" #$fileType
       Write-Host "The item is a file. $($_.Name)  >>>> newname: $newName" -ForegroundColor Yellow
-      if (-not $whatIf) {
+      if (-not $whatif) {
           try {
               Rename-Item -LiteralPath $_.FullName -NewName $newName -ErrorAction Stop
               $successCount++
@@ -98,6 +98,7 @@ Write-Host "---" -ForegroundColor Cyan
 Write-Host "Total files found: $totalFiles" -ForegroundColor Cyan
 Write-Host "Successfully renamed: $successCount" -ForegroundColor Green
 Write-Host "Failed to rename: $failedCount" -ForegroundColor Red
+Write-Host "Regex pattern used: $rxpattern" -ForegroundColor Magenta
 if ($failedFiles.Count -gt 0) {
     Write-Host "Failed files:" -ForegroundColor Red
     $failedFiles | ForEach-Object { Write-Host "  $_" }
