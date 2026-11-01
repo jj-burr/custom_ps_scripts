@@ -31,16 +31,26 @@ The default prefix is the source directory name (e.g., `On the Way to Meet Mom C
 ### Example with WhatIf
 
 ```powershell
-.\massrename.ps1 -whatif
+.\massrename.ps1 -whatIf
 ```
+
+Renames files in dry-run mode; no actual renames performed.
 
 ### Example with clean chapter prefix
 
 ```powershell
-.\massrename.ps1 -cleanchapter
+.\massrename.ps1 -cleanChapter
 ```
 
 Uses just `"Chapter "` as the prefix (e.g., `Chapter 001.cbz`) without the directory name.
+
+### Example with file-type filtering
+
+```powershell
+.\massrename.ps1
+```
+
+The script reads `config.json FILE_EXT` (default `.cbz,.rar`) and only processes files with those extensions; new filenames always append `.cbz`.
 
 ---
 
@@ -52,12 +62,31 @@ Uses just `"Chapter "` as the prefix (e.g., `Chapter 001.cbz`) without the direc
 .\volume-assignment.ps1
 ```
 
+### Example with WhatIf
+
+```powershell
+.\volume-assignment.ps1 -whatIf
+```
+
+Renames files in dry-run mode; no actual renames performed.
+
+### Example with volume flag
+
+```powershell
+.\volume-assignment.ps1 -volumeFlag
+```
+
+When present, forces `$volumeProcFlag`-like behaviour and adds `Vol ##` prefix to chapter filenames (e.g., `Manga Vol 01 Ch 001.cbz`).
+
 ### Config Updates Required
 
 The script reads `config.json` for the following settings:
 
 - `SRC_DIRECTORY` – source directory where chapter files reside
 - `FILE_EXT` – comma‑separated list of allowed file extensions (e.g., `.cbz,.rar`). The script will only process files with an extension present in this list and will use the first extension when constructing new filenames.
+- `volumeNumber` – starting volume number (from config, can be overridden)
+- `chapterTracker` – chapter counter (from config, can be overridden)
+- `volumeChapterMax` – chapters per volume (from config, can be overridden)
 
 Ensure the config values match your directory structure and file types before execution.
 
