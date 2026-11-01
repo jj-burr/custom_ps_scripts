@@ -26,36 +26,27 @@
 .\massrename.ps1
 ```
 
+The default prefix is the source directory name (e.g., `On the Way to Meet Mom Chapter 001.cbz`).
+
 ### Example with WhatIf
 
 ```powershell
 .\massrename.ps1 -whatIf
 ```
 
-### Example with DirName prefix
+### Example with clean chapter prefix
+
+```powershell
+.\massrename.ps1 -cleanChapter
+```
+
+Uses just `"Chapter "` as the prefix (e.g., `Chapter 001.cbz`) without the directory name.
+
+### Example with DirName prefix (explicit)
 
 ```powershell
 .\massrename.ps1 -usedirname
 ```
-
-### Example with FileType override
-
-```powershell
-.\massrename.ps1 -FileType ".cbz"
-```
-
-```powershell
-.\massrename.ps1 -FileType ".zip"
-```
-
-### Config Updates Required
-
-The script expects a `config.json` file at the same location with the following keys:
-
-- `SRC_DIRECTORY` – source directory containing the files to rename
-- `CBZ_FILE_EXT` – default file extension (e.g., `.cbz`); used if `-FileType` is not supplied
-
-The `-FileType` parameter overrides the config default. If omitted, `CBZ_FILE_EXT` from `config.json` is used.
 
 ---
 

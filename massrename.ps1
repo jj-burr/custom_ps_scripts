@@ -1,7 +1,8 @@
 # PS Script to rename all files in a directory based on regex pattern assigned in $rxpattern and a new prefix
 param(
-    [switch]$whatif,
+    [switch]$whatIf,
     [switch]$useDirName,
+    [switch]$cleanChapter,
     [string]$FileType = $CONFIG_OBJECT.CBZ_FILE_EXT
 )
 $CONFIG_FILE="C:\Users\jimmy\Documents\mlibrary\ps-scripts\custom_ps_scripts\config.json"
@@ -22,11 +23,11 @@ $rxpattern = "Chapter " #^(\d{0,3}\s)|\s\(\D*\-\D*\)|\s\(\d*\sof\s\d*\)|\s\(of\s
 # $manhwaPattern = "\s-\s(SE\s\d{1,3}\s\-)?[a-zA-z'\s\.,\-\d!]+"  # removes the chapter name and SE numbers
 # $rxLeadZPattern = "\.|c[h.0-9]{1,4} ch"
 $dirName = Split-Path -Path $SourceDirectory -Leaf # sometimes name is repeated, manually apply
-# Use directory name as prefix if -UseDirName switch is supplied, otherwise default to "Chapter "
-if ($useDirName) {
-    $newPrefix = "$dirName - Chapter "
-} else {
+# Default prefix is the directory name; -cleanChapter switch uses just "Chapter "
+if ($cleanChapter) {
     $newPrefix = "Chapter "
+} else {
+    $newPrefix = "$dirName - Chapter "
 } 
 
 # Get list of Chapter ###.cbz files
@@ -74,11 +75,12 @@ $items  |
       }
     } else {
       $fileExtension = $FileType #$_.Extension
-      Write-Host "fileExtension: $fileExtension" -ForegroundColor Cyan
+      # Write-Host "fileExtension: $fileExtension" -ForegroundColor Cyan
       $newName = "$cleanName$fileExtension" #$fileType
-      Write-Host "The item is a file. $($_.Name)  >>>> newname: $newName" -ForegroundColor Yellow
+
       if (-not $whatif) {
           try {
+              Write-Host " $($_.Name)  >>>> newname: $newName" -ForegroundColor Yellow
               Rename-Item -LiteralPath $_.FullName -NewName $newName -ErrorAction Stop
               $successCount++
           } catch {
