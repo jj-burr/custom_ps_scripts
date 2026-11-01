@@ -4,6 +4,5 @@
   "FILE_EXT": ".cbz,.rar",
   "volumeNumber": 26,
   "chapterTracker": 0,
-  "volumeChapterMax": 8,
-  "volumeProcFlag": false
+  "volumeChapterMax": 8
 }  

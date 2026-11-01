@@ -17,11 +17,7 @@ $items = Get-ChildItem -LiteralPath $SourceDirectory -Recurse -File "*"
 $items = $items | Where-Object { $allowedfiletypes -contains $_.Extension }
 # Rename extension is always .cbz
 $fileType = '.cbz'
-# Volume processing flag – can be overridden by –volumeFlag switch
-$volumeProcFlag = $CONFIG_OBJECT.volumeProcFlag
-if ($volumeFlag) { $volumeProcFlag = $true }
-
-# Debugging flags
+# Volume processing flag – set by –volumeFlag switch (default $false)
 $DEGBUGCONSOLE = $false
 $DEGBUGV = $false
 
@@ -61,7 +57,7 @@ if ($twoPProcFlag -eq $true) {
                        elseif ($matchvalue.Length -ge 3 -and $matchvalue.Contains(".")){([string]$matchvalue).PadLeft(5,'0')} #captures 02.1 , 22.1 > 002.1, 022.1
         # $cleanName = $_.BaseName -replace $rx2pattern, $matchvalue.PadLeft(3,'0') #$newPrefix # .Substring(1)  use to remove leading zero
         $chapterString = "Chapter $padChNumber"
-        if ($volumeProcFlag) {$newName = "dirName - $chapterString$fileType"}
+        if ($volumeFlag) {$newName = "dirName - $chapterString$fileType"}
         else {$newName = "$dirName - $chapterString$fileType"}
 
         if ($DEGBUGV) {write-host "DEBUG MODE - AFTER :::::::::::: Renaming file to $newName" -ForegroundColor green}
@@ -120,7 +116,7 @@ if ( $twoDone -eq $true -and $threePProcFlag -eq $true) {
 
 
 # Start volume assignment process when twoPProcFlag AND threePProcFlag is completed(true)
-if ($volumeProcFlag -eq $true -and $twoDone -eq $true -and $threeDone -eq $true) {
+if ($volumeFlag -and $twoDone -eq $true -and $threeDone -eq $true) {
   Write-host "Starting volume assignment process..." -ForegroundColor Cyan
   $chrxpattern = "\d{3}\.{0,1}\d{1}|\d{3}" # find chapter numbers. expecting 000 or 000.0 chapter format
   # Get list of Chapter ###.cbz files
@@ -150,9 +146,13 @@ if ($volumeProcFlag -eq $true -and $twoDone -eq $true -and $threeDone -eq $true)
         if ($DEGBUGV) {write-host "chapterNumber found == $chapterNumber" -ForegroundColor green}
         $volprefix ="Vol $paddVolNumber"
         $chprefix="Ch $chapterNumber"
-        # build final name ie. Manga Vol 01 Ch 001.cbz | Manga Vol 08 Ch 080.cbz 
-
-        $newFileName = "$dirName $volprefix $chprefix$fileType" #"$dirName - $volprefix$SPACE$chprefix$fileType"
+# build final name ie. Manga Vol 01 Ch 001.cbz | Manga Vol 08 Ch 080.cbz 
+        if ($volumeFlag) {
+            $newFileName = "$dirName $volprefix $chprefix$fileType"
+        }
+        else {
+            $newFileName = "$dirName $chprefix$fileType"
+        }
 
         if ($DEGBUGV) {write-host "newfilename == $newFileName" -ForegroundColor Cyan}
         else {
