@@ -31,13 +31,13 @@ The default prefix is the source directory name (e.g., `On the Way to Meet Mom C
 ### Example with WhatIf
 
 ```powershell
-.\massrename.ps1 -whatIf
+.\massrename.ps1 -whatif
 ```
 
 ### Example with clean chapter prefix
 
 ```powershell
-.\massrename.ps1 -cleanChapter
+.\massrename.ps1 -cleanchapter
 ```
 
 Uses just `"Chapter "` as the prefix (e.g., `Chapter 001.cbz`) without the directory name.

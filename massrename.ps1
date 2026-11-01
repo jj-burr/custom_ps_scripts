@@ -1,9 +1,8 @@
 # PS Script to rename all files in a directory based on regex pattern assigned in $rxpattern and a new prefix
 param(
-    [switch]$whatIf,
-    [switch]$useDirName,
-    [switch]$cleanChapter,
-    [string]$FileType = $CONFIG_OBJECT.CBZ_FILE_EXT
+    [switch]$whatif,
+    [switch]$cleanchapter,
+    [string]$filetype = $CONFIG_OBJECT.CBZ_FILE_EXT
 )
 $CONFIG_FILE="C:\Users\jimmy\Documents\mlibrary\ps-scripts\custom_ps_scripts\config.json"
 
@@ -74,7 +73,7 @@ $items  |
           $successCount++  # count whatif as "processed"
       }
     } else {
-      $fileExtension = $FileType #$_.Extension
+      $fileExtension = $filetype #$_.Extension
       # Write-Host "fileExtension: $fileExtension" -ForegroundColor Cyan
       $newName = "$cleanName$fileExtension" #$fileType
 
