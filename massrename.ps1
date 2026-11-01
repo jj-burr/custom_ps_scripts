@@ -2,17 +2,12 @@
 param(
     [switch]$whatif,
     [switch]$cleanchapter,
-    [string]$filetype = $CONFIG_OBJECT.CBZ_FILE_EXT
+    [string]$filetype = $CONFIG_OBJECT.FILE_EXT
 )
 $CONFIG_FILE="C:\Users\jimmy\Documents\mlibrary\ps-scripts\custom_ps_scripts\config.json"
 
 # Populate config file
 $CONFIG_OBJECT = Get-Content -Path $CONFIG_FILE | ConvertFrom-Json 
-
-# Ensure a file extension is always used; default to .cbz if missing
-if (-not $filetype -or $filetype -eq '') {
-    $filetype = '.cbz'
-}
 
 $SourceDirectory = $CONFIG_OBJECT.SRC_DIRECTORY
 Write-Host "Source Directory: $SourceDirectory" -ForegroundColor Green
@@ -34,8 +29,13 @@ if ($cleanChapter) {
     $newPrefix = "$dirName - Chapter "
 } 
 
-# Get list of Chapter ###.cbz files
+# Get list of Chapter ### files
 $items=Get-ChildItem -LiteralPath $SourceDirectory -Recurse -File "*" # Swap File to Directory here
+# Parse comma‑separated file extensions from config
+$allowedExtensions = $filetype -split ',\s*'
+# Use the first extension as the default rename extension
+$filetype = $allowedExtensions[0]
+# Total files (all files, extension check happens inside the loop)
 $totalFiles = $items.Count
 Write-Host "Total $filetype files found: $totalFiles" -ForegroundColor Cyan
 
@@ -47,11 +47,15 @@ $items  |
     # for each matched file increase chapterTracker++
     ForEach-Object {
      
-    $matchvalue = $Matches[0]
+$matchvalue = $Matches[0]
      write-host "matchvalue:::: $matchvalue" -ForegroundColor green
 
-    
-    $cleanName = $_.BaseName -replace $rxpattern,  $newprefix #"$newPrefix$matchvalue" #$newPrefix #
+     # Check if file extension is in the allowed list from config
+     if (!($_.Extension -in $allowedExtensions)) {
+         Write-Host "Note: $($_.Name) extension '$($_.Extension)' not in allowed list $filetype" -ForegroundColor Yellow
+     }
+
+     $cleanName = $_.BaseName -replace $rxpattern,  $newprefix #"$newPrefix$matchvalue" #$newPrefix #
     write-host "cleanName:::: $cleanName$filetype" -ForegroundColor green
     # write-host "newprefix:::: $newprefix" -ForegroundColor green
 

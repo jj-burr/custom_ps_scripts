@@ -42,12 +42,6 @@ The default prefix is the source directory name (e.g., `On the Way to Meet Mom C
 
 Uses just `"Chapter "` as the prefix (e.g., `Chapter 001.cbz`) without the directory name.
 
-### Example with DirName prefix (explicit)
-
-```powershell
-.\massrename.ps1 -usedirname
-```
-
 ---
 
 ## volume-assignment.ps1 <a name="volume-assignmentps1"></a>
@@ -63,7 +57,7 @@ Uses just `"Chapter "` as the prefix (e.g., `Chapter 001.cbz`) without the direc
 The script reads `config.json` for the following settings:
 
 - `SRC_DIRECTORY` – source directory where chapter files reside
-- `CBZ_FILE_EXT` – expected file extension (e.g., `.cbz`)
+- `FILE_EXT` – comma‑separated list of allowed file extensions (e.g., `.cbz,.rar`). The script will only process files with an extension present in this list and will use the first extension when constructing new filenames.
 
 Ensure the config values match your directory structure and file types before execution.
 
