@@ -7,7 +7,12 @@ param(
 $CONFIG_FILE="C:\Users\jimmy\Documents\mlibrary\ps-scripts\custom_ps_scripts\config.json"
 
 # Populate config file
-$CONFIG_OBJECT = Get-Content -Path $CONFIG_FILE | ConvertFrom-Json
+$CONFIG_OBJECT = Get-Content -Path $CONFIG_FILE | ConvertFrom-Json 
+
+# Ensure a file extension is always used; default to .cbz if missing
+if (-not $filetype -or $filetype -eq '') {
+    $filetype = '.cbz'
+}
 
 $SourceDirectory = $CONFIG_OBJECT.SRC_DIRECTORY
 Write-Host "Source Directory: $SourceDirectory" -ForegroundColor Green
@@ -32,7 +37,7 @@ if ($cleanChapter) {
 # Get list of Chapter ###.cbz files
 $items=Get-ChildItem -LiteralPath $SourceDirectory -Recurse -File "*" # Swap File to Directory here
 $totalFiles = $items.Count
-Write-Host "Total files found: $totalFiles" -ForegroundColor Cyan
+Write-Host "Total $filetype files found: $totalFiles" -ForegroundColor Cyan
 
 # Loop through each chapter individually
 $items  | 
@@ -47,7 +52,7 @@ $items  |
 
     
     $cleanName = $_.BaseName -replace $rxpattern,  $newprefix #"$newPrefix$matchvalue" #$newPrefix #
-    write-host "cleanName:::: $cleanName" -ForegroundColor green
+    write-host "cleanName:::: $cleanName$filetype" -ForegroundColor green
     # write-host "newprefix:::: $newprefix" -ForegroundColor green
 
     # Rename-Item -LiteralPath $_.FullName -NewName "$($_.Name)"  -WhatIf
@@ -57,7 +62,7 @@ $items  |
     if ($_.PSIsContainer) {
       # Directory logic rename
       ## Disabled to prevent losing file path when when proccessing files only
-      $newName = "$cleanName" #$fileType 
+      $newName = "$cleanName$filetype" #
       Write-Host "The item is a directory. $($_.Name) >>>> newname: $newName" -ForegroundColor Green
       if (-not $whatif) {
           try {
@@ -73,9 +78,9 @@ $items  |
           $successCount++  # count whatif as "processed"
       }
     } else {
-      $fileExtension = $filetype #$_.Extension
+      # $fileExtension = $filetype #$_.Extension
       # Write-Host "fileExtension: $fileExtension" -ForegroundColor Cyan
-      $newName = "$cleanName$fileExtension" #$fileType
+      $newName = "$cleanName$filetype" 
 
       if (-not $whatif) {
           try {
@@ -96,7 +101,7 @@ $items  |
 
 # Summary
 Write-Host "---" -ForegroundColor Cyan
-Write-Host "Total files found: $totalFiles" -ForegroundColor Cyan
+Write-Host "Total $filetype files found: $totalFiles" -ForegroundColor Cyan
 Write-Host "Successfully renamed: $successCount" -ForegroundColor Green
 Write-Host "Failed to rename: $failedCount" -ForegroundColor Red
 Write-Host "Regex pattern used: $rxpattern" -ForegroundColor Magenta
