@@ -1,7 +1,8 @@
 # PS Script to rename all files in a directory based on regex pattern assigned in $rxpattern and a new prefix
 param(
     [switch]$WhatIf,
-    [switch]$UseDirName
+    [switch]$UseDirName,
+    [string]$FileType = $CONFIG_OBJECT.CBZ_FILE_EXT
 )
 $CONFIG_FILE="C:\Users\jimmy\Documents\mlibrary\ps-scripts\custom_ps_scripts\config.json"
 
@@ -17,11 +18,10 @@ $dirName = Split-Path -Path $SourceDirectory -Leaf # sometimes name is repeated,
 # todo: create option to set dirname into the newPrefix variable for the new filename
 # Use directory name as prefix if -UseDirName switch is supplied, otherwise default to "Chapter "
 if ($UseDirName) {
-    $newPrefix = $dirName
+    $newPrefix = "$dirName - Chapter "
 } else {
     $newPrefix = "Chapter "
-}
-# $fileType=".cbr"
+} 
 
 # Get list of Chapter ###.cbz files
 $items=Get-ChildItem -LiteralPath $SourceDirectory -Recurse -File "*" # Swap File to Directory here
@@ -58,7 +58,7 @@ $items  |
             Write-Host "[WhatIf] Would rename directory $($_.Name) to $newName" -ForegroundColor Gray
         }
       } else {
-        $fileExtension = ".cbz" #$_.Extension
+        $fileExtension = $FileType #$_.Extension
         Write-Host "fileExtension: $fileExtension" -ForegroundColor Cyan
         $newName = "$cleanName$fileExtension" #$fileType
         Write-Host "The item is a file. $($_.Name)  >>>> newname: $newName" -ForegroundColor Yellow

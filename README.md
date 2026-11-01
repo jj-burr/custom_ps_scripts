@@ -38,19 +38,24 @@
 .\massrename.ps1 -UseDirName
 ```
 
+### Example with FileType override
+
+```powershell
+.\massrename.ps1 -FileType ".cbz"
+```
+
+```powershell
+.\massrename.ps1 -FileType ".zip"
+```
+
 ### Config Updates Required
 
 The script expects a `config.json` file at the same location with the following keys:
 
 - `SRC_DIRECTORY` – source directory containing the files to rename
-- `CBZ_FILE_EXT` – file extension to apply (e.g., `.cbz`)
+- `CBZ_FILE_EXT` – default file extension (e.g., `.cbz`); used if `-FileType` is not supplied
 
-The `NEW_PREFIX` key has been removed. The new prefix is determined by the `-UseDirName` switch:
-
-- **Default** (`-UseDirName` not used): prefix is `"Chapter "` (e.g., `Chapter 001.cbz`).
-- **Use directory name** (`-UseDirName`): prefix is the source directory name (e.g., `On the Way to Meet Mom Chapter 001.cbz`).
-
-Update `config.json` with the appropriate `SRC_DIRECTORY` and `CBZ_FILE_EXT` values before running.
+The `-FileType` parameter overrides the config default. If omitted, `CBZ_FILE_EXT` from `config.json` is used.
 
 ---
 
