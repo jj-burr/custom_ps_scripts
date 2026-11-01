@@ -1,8 +1,8 @@
-
 # Assign volume number to each chapter and increment volume number for every n chapters
 param(
     [switch]$whatIf,
-    [switch]$volumeFlag
+    [switch]$volumeflag,
+    [switch]$debugv
 )
 $CONFIG_FILE="C:\Users\jimmy\Documents\mlibrary\ps-scripts\custom_ps_scripts\config.json"
 # Populate config file
@@ -15,11 +15,8 @@ $allowedfiletypes = $CONFIG_OBJECT.FILE_EXT -split ',\s*'
 # Keep only files whose extension is in the allowed list
 $items = Get-ChildItem -LiteralPath $SourceDirectory -Recurse -File "*"
 $items = $items | Where-Object { $allowedfiletypes -contains $_.Extension }
-# Rename extension is always .cbz
-$fileType = '.cbz'
-# Volume processing flag – set by –volumeFlag switch (default $false)
-$DEGBUGCONSOLE = $false
-$DEGBUGV = $false
+
+# Volume processing flag – set by –volumeflag switch (default $false) 
 
 # used to block off the processing for the two and three digit chapter files
 $twoPProcFlag = $true
@@ -35,7 +32,17 @@ $chapterTracker = $CONFIG_OBJECT.chapterTracker
 $volumeChapterMax = $CONFIG_OBJECT.volumeChapterMax
 
 # Static variables
-$SPACE=" "
+$dirName = Split-Path -Path $SourceDirectory -Leaf # sometimes name is repeated, manually apply
+Write-Host "Source Directory: $SourceDirectory" -ForegroundColor Green
+Write-Host "Processing directory: $dirName" -ForegroundColor Cyan
+$SPACE=" " 
+$fileType = '.cbz'
+
+# Tracking variables
+$totalFiles = $items.Count
+$successCount = 0
+$failedCount = 0
+$failedFiles = @()
 
 if ($twoPProcFlag -eq $true) {
   # find chapter numbers various chapter formats with 2 digits
@@ -52,22 +59,28 @@ if ($twoPProcFlag -eq $true) {
         $bad02filename = $_ 
         $matchlength=$matchvalue.length
         # write-host "filename $_"
-        if ($DEGBUGV) {write-host "DEBUG MODE - BEFORE :::matchvalue $matchvalue ::: matchlength $matchlength ::: Bad filename with 2 digits :: $bad02filename" -ForegroundColor Magenta}
+        if ($debugv) {write-host "DEBUG MODE - BEFORE :::matchvalue $matchvalue ::: matchlength $matchlength ::: Bad filename with 2 digits :: $bad02filename" -ForegroundColor Magenta}
         $padChNumber = if ($matchvalue.Length -lt 3 -and $matchvalue -notlike "*.*"){$matchvalue.PadLeft(3, '0')} # captures 1, 03  > 001, 003
                        elseif ($matchvalue.Length -ge 3 -and $matchvalue.Contains(".")){([string]$matchvalue).PadLeft(5,'0')} #captures 02.1 , 22.1 > 002.1, 022.1
         # $cleanName = $_.BaseName -replace $rx2pattern, $matchvalue.PadLeft(3,'0') #$newPrefix # .Substring(1)  use to remove leading zero
         $chapterString = "Chapter $padChNumber"
-        if ($volumeFlag) {$newName = "dirName - $chapterString$fileType"}
-        else {$newName = "$dirName - $chapterString$fileType"}
+        $newName = "$dirName - $chapterString$fileType"
 
-        if ($DEGBUGV) {write-host "DEBUG MODE - AFTER :::::::::::: Renaming file to $newName" -ForegroundColor green}
+        if ($debugv) {write-host "DEBUG MODE - AFTER :::::::::::: Renaming file to $newName" -ForegroundColor green}
         else {
             if ($whatIf) {
                 Write-Host "[WhatIf] Would rename file $($_.Name) to $newName" -ForegroundColor Gray
+                $successCount++
             }
             else {
                 if (-not (Test-Path $newName)) {
                     Rename-Item -Path $_.FullName -NewName $newName
+                    $successCount++
+                }
+                else {
+                    $failedCount++
+                    $failedFiles += $_.FullName
+                    Write-Host "SKIP (exists): $($_.Name)" -ForegroundColor Yellow
                 }
             }
         }
@@ -75,7 +88,6 @@ if ($twoPProcFlag -eq $true) {
       $twoDone = $true
       Write-host "End of 2 Digit Chapter name update... twoPProcFlag = $twoPProcFlag" -ForegroundColor Cyan    
 }
-
 
 if ( $twoDone -eq $true -and $threePProcFlag -eq $true) {
   # find chapter numbers various chapter formats with 3 digits following and (deciaml or not)
@@ -86,37 +98,42 @@ if ( $twoDone -eq $true -and $threePProcFlag -eq $true) {
     Where-Object { $_.BaseName -imatch $rx3pattern} | 
       ForEach-Object {
         $matchValue = $Matches[0].TrimStart() # remove leading space if exists
-        if ($DEGBUGV) {write-host "regex matched filename:: $_"}
+        if ($debugv) {write-host "regex matched filename:: $_"}
         $bad03BaseName = $_.BaseName
         $matchlength=$matchvalue.length 
-        if ($DEGBUGV) {write-host "BEFORE :::match length $matchlength::: Bad filename with 3 digits ::: $bad03BaseName" -ForegroundColor red}
+        if ($debugv) {write-host "BEFORE :::match length $matchlength::: Bad filename with 3 digits ::: $bad03BaseName" -ForegroundColor red}
         # $cleanName = $_.BaseName -replace $rx3pattern, $matchvalue.PadLeft(3,'0') #$newPrefix # .Substring(1)  use to remove leading zero
         $chapterString = "Chapter $matchValue" 
-        if ($DEGBUGV) {write-host "threeProc chapter match ::: matchvalue: $matchValue chapterstring: $chapterString" }
+        if ($debugv) {write-host "threeProc chapter match ::: matchvalue: $matchValue chapterstring: $chapterString" }
         
-        if ($volumeFlag) {$newName = "dirName - $chapterString$fileType"}
-        else {$newName = "$dirName - $chapterString$fileType"}
+        $newName = "$dirName - $chapterString$fileType"
         
-        if ($DEGBUGV -eq $true) {write-host "DEBUG MODE - AFTER :::::: Renaming file to $newName" -ForegroundColor green}
+        if ($debugv -eq $true) {write-host "DEBUG MODE - AFTER :::::: Renaming file to $newName" -ForegroundColor green}
         else {
             if ($whatIf) {
                 Write-Host "[WhatIf] Would rename file $($_.Name) to $newName" -ForegroundColor Gray
+                $successCount++
             }
             else {
                 if (-not (Test-Path $newName)) {
                     Rename-Item -Path $_.FullName -NewName $newName
+                    $successCount++
+                }
+                else {
+                    $failedCount++
+                    $failedFiles += $_.FullName
+                    Write-Host "SKIP (exists): $($_.Name)" -ForegroundColor Yellow
                 }
             }
         }
       }
       $threeDone = $true
-      if ($DEGBUGV) {Write-host "!!!!DEBUG MODE ENABLED!!!! End of 3 Digit Chapter name update... threePProcFlag = $threePProcFlag" -ForegroundColor Cyan}
+      if ($debugv) {Write-host "!!!!DEBUG MODE ENABLED!!!! End of 3 Digit Chapter name update... threePProcFlag = $threePProcFlag" -ForegroundColor Cyan}
       else {Write-host "End of 3 Digit Chapter name update... threePProcFlag = $threePProcFlag" -ForegroundColor Green}
 }
 
-
 # Start volume assignment process when twoPProcFlag AND threePProcFlag is completed(true)
-if ($volumeFlag -and $twoDone -eq $true -and $threeDone -eq $true) {
+if ($volumeflag -and $twoDone -eq $true -and $threeDone -eq $true) {
   Write-host "Starting volume assignment process..." -ForegroundColor Cyan
   $chrxpattern = "\d{3}\.{0,1}\d{1}|\d{3}" # find chapter numbers. expecting 000 or 000.0 chapter format
   # Get list of Chapter ###.cbz files
@@ -143,29 +160,47 @@ if ($volumeFlag -and $twoDone -eq $true -and $threeDone -eq $true) {
 
         $paddVolNumber = ([string]$volumeNumber).PadLeft(2, '0')
         $chapterNumber = $Matches[0] #([string]$Matches[0]).PadLeft(3, '0')
-        if ($DEGBUGV) {write-host "chapterNumber found == $chapterNumber" -ForegroundColor green}
+        if ($debugv) {write-host "chapterNumber found == $chapterNumber" -ForegroundColor green}
         $volprefix ="Vol $paddVolNumber"
         $chprefix="Ch $chapterNumber"
 # build final name ie. Manga Vol 01 Ch 001.cbz | Manga Vol 08 Ch 080.cbz 
-        if ($volumeFlag) {
+        if ($volumeflag) {
             $newFileName = "$dirName $volprefix $chprefix$fileType"
         }
         else {
             $newFileName = "$dirName $chprefix$fileType"
         }
 
-        if ($DEGBUGV) {write-host "newfilename == $newFileName" -ForegroundColor Cyan}
+        if ($debugv) {write-host "newfilename == $newFileName" -ForegroundColor Cyan}
         else {
             if ($whatIf) {
                 Write-Host "[WhatIf] Would rename file to $newFileName" -ForegroundColor Gray
+                $successCount++
             }
             else {
                 if (-not (Test-Path $newFileName)) {
                     Rename-Item -Path $_.FullName -NewName $newFileName
+                    $successCount++
+                }
+                else {
+                    $failedCount++
+                    $failedFiles += $_.FullName
+                    Write-Host "SKIP (exists): $($_.Name)" -ForegroundColor Yellow
                 }
             }
         }
-        }
-      if ($DEGBUGV) {Write-host "!!!!DEBUG!!! End of Volume Chapter Assignment!!!" -ForegroundColor Cyan}
-      else {Write-host "End of Volume Chapter Assignment!!!" -ForegroundColor Green}
-}  
+      }
+  if ($debugv) {Write-host "!!!!DEBUG!!! End of Volume Chapter Assignment!!!" -ForegroundColor Cyan}
+  else {Write-host "End of Volume Chapter Assignment!!!" -ForegroundColor Green}
+}
+
+# Summary output
+Write-Host "---" -ForegroundColor Cyan
+Write-Host "Source directory: $dirName" -ForegroundColor Cyan
+Write-Host "Total $fileType files found: $totalFiles" -ForegroundColor Cyan
+Write-Host "Successfully renamed: $successCount" -ForegroundColor Green
+Write-Host "Failed to rename: $failedCount" -ForegroundColor Red
+if ($failedFiles.Count -gt 0) {
+    Write-Host "Failed files:" -ForegroundColor Red
+    $failedFiles | ForEach-Object { Write-Host "  $_" }
+}
