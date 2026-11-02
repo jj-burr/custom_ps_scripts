@@ -82,13 +82,28 @@ When present, forces `$volumeProcFlag`-like behaviour and adds `Vol ##` prefix t
 
 The script reads `config.json` for the following settings:
 
-- `SRC_DIRECTORY` – source directory where chapter files reside
+- `BASE_SRC_DIRECTORY` – base source directory path (without the last subdirectory segment). All processing occurs under subdirectories listed in `TARGET_DIRS`.
+- `TARGET_DIRS` – comma‑delimited list of subdirectory names (e.g., `"Series1, Series2, Series3"`). For each entry, the script processes files under `$BASE_SRC_DIRECTORY\$targetDir`. The directory name is also used as the `$dirName` prefix for renamed files.
 - `FILE_EXT` – comma‑separated list of allowed file extensions (e.g., `.cbz,.rar`). The script will only process files with an extension present in this list and will use the first extension when constructing new filenames.
 - `volumeNumber` – starting volume number (from config, can be overridden)
 - `chapterTracker` – chapter counter (from config, can be overridden)
 - `volumeChapterMax` – chapters per volume (from config, can be overridden)
 
 Ensure the config values match your directory structure and file types before execution.
+
+Example `config.json`:
+
+```json
+{
+  "BASE_SRC_DIRECTORY": "C:\\Users\\jimmy\\Downloads\\00_fmd_downloads",
+  "TARGET_DIRS": "Destroy All Humans. They Can't Be Regenerated",
+  "TGT_DIRECTORY": "C:\\Users\\jimmy\\Downloads\\00_fmd_downloads\\Kill the Villainess\\renamed",
+  "FILE_EXT": ".cbz,.rar",
+  "volumeNumber": 26,
+  "chapterTracker": 0,
+  "volumeChapterMax": 8
+}
+```
 
 ---
 
