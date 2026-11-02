@@ -1,5 +1,6 @@
 {
-  "SRC_DIRECTORY": "C:\\Users\\jimmy\\Downloads\\00_fmd_downloads\\Nano Machine",  
+  "BASE_SRC_DIRECTORY": "C:\\Users\\jimmy\\Downloads\\00_fmd_downloads",
+  "TARGET_DIRS": "Destroy All Humans. They Can't Be Regenerated",
   "TGT_DIRECTORY": "C:\\Users\\jimmy\\Downloads\\00_fmd_downloads\\Kill the Villainess\\renamed",
   "FILE_EXT": ".cbz,.rar",
   "volumeNumber": 26,
