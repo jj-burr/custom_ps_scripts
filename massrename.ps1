@@ -18,13 +18,13 @@ $successCount = 0
 $failedCount = 0
 $failedFiles = @()
 
-$rxpattern = "Chapter " #^(\d{0,3}\s)|\s\(\D*\-\D*\)|\s\(\d*\sof\s\d*\)|\s\(of\s\d*\)" #"\s\(\D*\s?\)|\(\w*\)\s" #"\s\(\D*\s?\)|\s?\(.*\)\s?" #"\s\(\D*\s?\)|\(\w*\)\s"
+$rxpattern = "Subete no jinrui o hakai suru. Sorera wa saisei dekinai. " #^(\d{0,3}\s)|\s\(\D*\-\D*\)|\s\(\d*\sof\s\d*\)|\s\(of\s\d*\)" #"\s\(\D*\s?\)|\(\w*\)\s" #"\s\(\D*\s?\)|\s?\(.*\)\s?" #"\s\(\D*\s?\)|\(\w*\)\s"
 # $manhwaPattern = "\s-\s(SE\s\d{1,3}\s\-)?[a-zA-z'\s\.,\-\d!]+"  # removes the chapter name and SE numbers
 # $rxLeadZPattern = "\.|c[h.0-9]{1,4} ch"
 $dirName = Split-Path -Path $SourceDirectory -Leaf # sometimes name is repeated, manually apply
 # Default prefix is the directory name; -cleanChapter switch uses just "Chapter "
 if ($cleanChapter) {
-    $newPrefix = "Chapter "
+    $newPrefix = "Hound - Chapter "
 } else {
     $newPrefix = "$dirName - Chapter "
 } 
