@@ -95,13 +95,12 @@ Example `config.json`:
 
 ```json
 {
-  "BASE_SRC_DIRECTORY": "C:\\Users\\jimmy\\Downloads\\00_fmd_downloads",
-  "TARGET_DIRS": "Destroy All Humans. They Can't Be Regenerated",
-  "TGT_DIRECTORY": "C:\\Users\\jimmy\\Downloads\\00_fmd_downloads\\Kill the Villainess\\renamed",
+  "BASE_SRC_DIRECTORY": "A:\\path\\to\\directory",
+  "TARGET_DIRS": "Series1, Series2, Series3",
   "FILE_EXT": ".cbz,.rar",
-  "volumeNumber": 26,
+  "volumeNumber": 1,
   "chapterTracker": 0,
-  "volumeChapterMax": 8
+  "volumeChapterMax": 10
 }
 ```
 
